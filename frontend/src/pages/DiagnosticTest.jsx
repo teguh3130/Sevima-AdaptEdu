@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { addDoc, collection, serverTimestamp, updateDoc } from 'firebase/firestore'
 import { db } from '../lib/firebase.js'
 import questions from '../data/questions.js'
@@ -8,6 +9,8 @@ const TOTAL = questions.length
 const API_BASE = import.meta.env.VITE_API_BASE_URL || ''
 
 function DiagnosticTest() {
+  const location = useLocation()
+  const navigate = useNavigate()
   const [index, setIndex] = useState(0)
   const [selected, setSelected] = useState(null)
   const [answers, setAnswers] = useState([])
@@ -21,6 +24,19 @@ function DiagnosticTest() {
   const [practiceError, setPracticeError] = useState('')
   const [name, setName] = useState('')
   const [started, setStarted] = useState(false)
+  const [practiceOnly, setPracticeOnly] = useState(false)
+
+  const practiceLevel = location.state?.practiceLevel
+
+  useEffect(() => {
+    if (!practiceLevel) return
+    setStarted(true)
+    setFinished(true)
+    setPracticeOnly(true)
+    startPractice(practiceLevel)
+    navigate(location.pathname, { replace: true, state: null })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const current = questions[index]
   const isLast = index === TOTAL - 1
@@ -76,14 +92,14 @@ function DiagnosticTest() {
     }
   }
 
-  async function startPractice() {
+  async function startPractice(levelOverride) {
     setPracticeLoading(true)
     setPracticeError('')
     try {
       const response = await fetch(`${API_BASE}/api/practice`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ level: analysis?.level }),
+        body: JSON.stringify({ level: levelOverride ?? analysis?.level }),
       })
       if (!response.ok) throw new Error(`HTTP ${response.status}`)
       const data = await response.json()
@@ -236,7 +252,9 @@ function DiagnosticTest() {
               <button
                 type="button"
                 className="btn btn--ghost"
-                onClick={() => setPractice(null)}
+                onClick={() =>
+                  practiceOnly ? navigate('/ringkasan') : setPractice(null)
+                }
               >
                 Kembali ke Hasil
               </button>
@@ -374,6 +392,19 @@ function DiagnosticTest() {
           {saveState === 'idle' && ''}
         </p>
         <div className="test__actions test__actions--center">
+          <button
+            type="button"
+            className="btn btn--ghost"
+            onClick={() =>
+              navigate('/ringkasan', {
+                state: {
+                  result: { name, score, total: TOTAL, level: analysis?.level },
+                },
+              })
+            }
+          >
+            Lihat Ringkasan
+          </button>
           <button
             type="button"
             className="btn btn--primary"

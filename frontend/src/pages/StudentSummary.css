@@ -1,0 +1,147 @@
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: clamp(2rem, 6vw, 3.5rem) 0;
+}
+
+.summary__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.summary__badge {
+  padding: 0.35rem 0.9rem;
+  border: 1px solid var(--accent-border);
+  border-radius: 999px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.summary__subtitle {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.summary__status {
+  margin: 0;
+  padding: 2rem 0;
+  text-align: center;
+  color: var(--text);
+}
+
+.summary__status--error {
+  color: #ef4444;
+}
+
+.summary__card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  text-align: center;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: clamp(1.75rem, 6vw, 3rem) 1.25rem;
+}
+
+.ring {
+  position: relative;
+  width: 180px;
+  height: 180px;
+}
+
+.ring svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.ring__track,
+.ring__value {
+  fill: none;
+  stroke-width: 14;
+}
+
+.ring__track {
+  stroke: var(--border);
+}
+
+.ring__value {
+  stroke: var(--ring-color);
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  transition: stroke-dashoffset 0.7s ease;
+}
+
+.ring__center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2px;
+  padding-top: 62px;
+}
+
+.ring__center strong {
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: -1.5px;
+  color: var(--text-h);
+}
+
+.ring__center span {
+  font-size: 1.1rem;
+  color: var(--text);
+}
+
+.summary__name {
+  margin: 0.5rem 0 0;
+  font-size: clamp(1.3rem, 4vw, 1.7rem);
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+.summary__level {
+  padding: 0.4rem 1.4rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.summary__level--dasar {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.55);
+  color: #ef4444;
+}
+
+.summary__level--menengah {
+  background: rgba(234, 179, 8, 0.15);
+  border-color: rgba(234, 179, 8, 0.55);
+  color: #eab308;
+}
+
+.summary__level--lanjut {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: rgba(34, 197, 94, 0.55);
+  color: #22c55e;
+}
+
+.summary__score {
+  margin: 0;
+  color: var(--text);
+}
+
+.summary__card .btn {
+  margin-top: 0.5rem;
+}
