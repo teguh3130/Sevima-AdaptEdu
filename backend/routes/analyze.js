@@ -1,15 +1,7 @@
 import { Router } from 'express'
-import { GoogleGenAI } from '@google/genai'
+import { generateText } from '../lib/gemini.js'
 
 const router = Router()
-
-const MODELS = (
-  process.env.GEMINI_MODEL ||
-  'gemini-3.8-flash,gemini-flash-latest,gemini-flash-lite-latest'
-)
-  .split(',')
-  .map((model) => model.trim())
-  .filter(Boolean)
 
 const PROMPT =
   'Kamu adalah guru Matematika SMP Indonesia. Berdasarkan skor berikut tentukan level belajar: Dasar, Menengah, atau Lanjut. Berikan alasan maksimal satu kalimat. Balas hanya dalam format JSON dengan field level dan reason.'
@@ -52,30 +44,22 @@ router.post('/api/analyze-score', async (req, res) => {
     return res.status(400).json({ error: 'Skor tidak valid' })
   }
 
-  const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
-  const contents = `${PROMPT}\n\nSkor: ${score}/${total}`
+  try {
+    const { text } = await generateText({
+      contents: `${PROMPT}\n\nSkor: ${score}/${total}`,
+      temperature: 0,
+      config: { responseMimeType: 'application/json' },
+    })
 
-  for (const model of MODELS) {
-    try {
-      const response = await ai.models.generateContent({
-        model,
-        contents,
-        config: {
-          temperature: 0,
-          responseMimeType: 'application/json',
-        },
-      })
+    const parsed = parseResult(text)
 
-      const parsed = parseResult(response.text)
-
-      if (parsed) {
-        return res.json({ ...parsed, source: 'gemini' })
-      }
-
-      console.error(`Gemini (${model}) mengembalikan format tak sesuai`)
-    } catch (error) {
-      console.error(`Gemini (${model}) gagal:`, error?.message ?? error)
+    if (parsed) {
+      return res.json({ ...parsed, source: 'gemini' })
     }
+
+    console.error('Gemini mengembalikan format tak sesuai')
+  } catch (error) {
+    console.error('Analisis Gemini gagal:', error?.message ?? error)
   }
 
   return res.json({

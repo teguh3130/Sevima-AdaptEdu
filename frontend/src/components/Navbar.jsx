@@ -18,6 +18,9 @@ function Navbar() {
           <NavLink to="/tes-diagnostik" className="navbar__link">
             Tes Diagnostik
           </NavLink>
+          <NavLink to="/ai-tutor" className="navbar__link">
+            AI Tutor
+          </NavLink>
         </nav>
       </div>
     </header>
