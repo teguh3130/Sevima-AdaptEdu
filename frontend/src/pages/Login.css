@@ -1,0 +1,131 @@
+.login {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.login__card {
+  width: min(420px, 100%);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: clamp(1.5rem, 5vw, 2.25rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.login__badge {
+  align-self: flex-start;
+  padding: 0.3rem 0.85rem;
+  border: 1px solid var(--accent-border);
+  border-radius: 999px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.login__title {
+  margin: 0.5rem 0 0;
+  font-size: clamp(1.35rem, 4vw, 1.7rem);
+  color: var(--text-h);
+}
+
+.login__subtitle {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--text);
+}
+
+.login__tabs {
+  display: flex;
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+  padding: 0.25rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.login__tab {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.login__tab--active {
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.login__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.login__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
+.login__field input {
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+.login__field input::placeholder {
+  color: var(--text);
+}
+
+.login__roles {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.login__role {
+  flex: 1;
+  padding: 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.92rem;
+  cursor: pointer;
+}
+
+.login__role--active {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.login__error {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #ef4444;
+}
+
+.login__submit {
+  width: 100%;
+  margin-top: 0.25rem;
+}

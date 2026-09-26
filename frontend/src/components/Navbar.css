@@ -66,6 +66,23 @@
   font-weight: 500;
 }
 
+.navbar__logout {
+  border: none;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
+.navbar__login {
+  border: 1px solid var(--accent-border);
+  color: var(--accent);
+}
+
+.navbar__login:hover {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
 @media (max-width: 720px) {
   .navbar__inner {
     flex-wrap: wrap;

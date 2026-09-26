@@ -139,7 +139,7 @@ function StudentSummary() {
           className="btn btn--primary"
           onClick={() => navigate('/tes-diagnostik', { state: { practiceLevel: level } })}
         >
-          Mulai Latihan
+          Mulai Latihan Selanjutnya
         </button>
       </div>
     </section>

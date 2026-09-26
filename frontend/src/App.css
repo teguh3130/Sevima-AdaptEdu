@@ -4,6 +4,21 @@
   min-height: 100svh;
 }
 
+.app--loading {
+  justify-content: center;
+}
+
+.auth-shell {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background:
+    radial-gradient(900px 480px at 15% -10%, rgba(109, 59, 255, 0.3), transparent 60%),
+    radial-gradient(720px 420px at 110% 110%, rgba(255, 79, 163, 0.18), transparent 60%),
+    var(--bg);
+}
+
 .main {
   flex: 1;
   width: min(1100px, 100% - 2rem);
