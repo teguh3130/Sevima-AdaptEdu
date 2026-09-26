@@ -1,0 +1,23 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+.main {
+  flex: 1;
+  width: min(1100px, 100% - 2rem);
+  margin-inline: auto;
+}
+
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 1.25rem 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.footer p {
+  margin: 0;
+}
