@@ -1,0 +1,314 @@
+/* ==========================================================
+   Design tokens
+   ------------------------------------------------------------
+   1. Foundation  -> tokens that never change between themes
+   2. Dark mode   -> default palette (:root fallback + [data-theme='dark'])
+   3. Light mode  -> [data-theme='light'] overrides only
+   4. Components  -> legacy aliases kept so the existing markup keeps working
+   ========================================================== */
+
+/* ==========================================================
+   1. Foundation (theme independent)
+   ========================================================== */
+:root {
+  /* Brand palette (sama di kedua tema) */
+  --primary: #6d5ef8;
+  --secondary: #8b7cf9;
+
+  --gradient-accent: linear-gradient(135deg, #8b7cf9, #38bdf8);
+  --gradient-success: linear-gradient(135deg, var(--success), var(--success-alt));
+  --gradient-warning: linear-gradient(135deg, var(--warning), var(--warning-alt));
+  --gradient-danger: linear-gradient(135deg, var(--danger), var(--danger-alt));
+  --gradient-info: linear-gradient(135deg, var(--info), var(--info-alt));
+
+  /* Radius */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-pill: 999px;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+
+  /* Motion - transisi dibatasi 250ms (lihat bagian Accessibility) */
+  --dur-fast: 200ms;
+  --dur-base: 250ms;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* Typography */
+  --sans:
+    'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+  --fs-h1: clamp(2rem, 5.2vw, 3rem);
+  --fs-h2: clamp(1.5rem, 4vw, 2.25rem);
+  --fs-h3: clamp(1.25rem, 3vw, 1.5rem);
+  --fs-body: 1rem;
+  --fs-caption: 0.875rem;
+}
+
+/* ==========================================================
+   2. Dark Mode (default)
+   ========================================================== */
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* Core */
+  --bg: #080a13;
+  --surface: #121623;
+  --surface-hover: #1a2033;
+  --border: rgba(255, 255, 255, 0.08);
+
+  --text-h: #ffffff;
+  --text: #a7b0c3;
+  --placeholder: rgba(167, 176, 195, 0.68);
+  --on-primary: #ffffff;
+  /* Tinta gelap di atas gradient status terang (hijau/merah) */
+  --on-status: #0b1a10;
+
+  /* Gradients
+     Ujung gradasi ditahan gelap agar teks --on-primary di atasnya
+     tetap memenuhi WCAG AA (4.5:1): putih vs #6d5ef8 = 4.56:1. */
+  --gradient-primary: linear-gradient(135deg, #6d5ef8 0%, #4f46e5 100%);
+  --gradient-primary-soft: linear-gradient(135deg, rgba(109, 94, 248, 0.22), rgba(167, 139, 250, 0.08));
+
+  /* Accent (kecerahan tinggi di atas latar gelap) */
+  --accent: #b9a8ff;
+  --accent-bg: rgba(109, 94, 248, 0.16);
+  --accent-border: rgba(109, 94, 248, 0.45);
+
+  /* Status */
+  --success: #22c55e;
+  --success-alt: #14b8a6;
+  --success-text: #22c55e;
+  --success-bg: rgba(34, 197, 94, 0.15);
+  --success-border: rgba(34, 197, 94, 0.5);
+
+  --warning: #facc15;
+  --warning-alt: #f59e0b;
+  --warning-text: #facc15;
+  --warning-bg: rgba(250, 204, 21, 0.15);
+  --warning-border: rgba(250, 204, 21, 0.5);
+
+  --danger: #ef4444;
+  --danger-alt: #f97316;
+  --danger-text: #f87171;
+  --danger-bg: rgba(239, 68, 68, 0.12);
+  --danger-border: rgba(239, 68, 68, 0.5);
+
+  --info: #38bdf8;
+  --info-alt: #6d5ef8;
+  --info-text: #38bdf8;
+  --info-bg: rgba(56, 189, 248, 0.12);
+  --info-border: rgba(56, 189, 248, 0.45);
+
+  /* Warna mata pelajaran */
+  --blue: #38bdf8;
+  --blue-bg: rgba(56, 189, 248, 0.12);
+  --blue-border: rgba(56, 189, 248, 0.45);
+
+  --green: #22c55e;
+  --green-bg: rgba(34, 197, 94, 0.12);
+  --green-border: rgba(34, 197, 94, 0.45);
+
+  --purple: #c4b5fd;
+  --purple-bg: rgba(167, 139, 250, 0.12);
+  --purple-border: rgba(167, 139, 250, 0.45);
+
+  --orange: #fb923c;
+  --orange-bg: rgba(251, 146, 60, 0.12);
+  --orange-border: rgba(251, 146, 60, 0.45);
+
+  /* Lapisan transparan (dipakai card, input, chip, tabel) */
+  --veil: rgba(255, 255, 255, 0.03);
+  --veil-hover: rgba(255, 255, 255, 0.05);
+  --field-bg: rgba(255, 255, 255, 0.04);
+  --field-border: rgba(255, 255, 255, 0.12);
+  --track-bg: rgba(255, 255, 255, 0.05);
+  --skeleton-bg: rgba(255, 255, 255, 0.06);
+  --sheen: rgba(255, 255, 255, 0.25);
+  --ripple: rgba(255, 255, 255, 0.4);
+  --scrollbar: rgba(167, 139, 250, 0.35);
+  --scrollbar-hover: rgba(167, 139, 250, 0.55);
+  --noise-opacity: 0.035;
+
+  /* Fokus keyboard (harus terlihat di kedua tema) */
+  --focus-ring: var(--primary);
+  --focus-ring-offset: 2px;
+
+  /* Glassmorphism */
+  --glass-bg: rgba(18, 22, 35, 0.72);
+  --glass-bg-strong: rgba(18, 22, 35, 0.88);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: 18px;
+
+  /* Baris tetap (navbar, tabel, footer) */
+  --navbar-bg: rgba(8, 10, 19, 0.72);
+  --navbar-bg-scrolled: rgba(8, 10, 19, 0.9);
+  --table-head-bg: rgba(18, 22, 35, 0.95);
+  --table-zebra: rgba(255, 255, 255, 0.022);
+  --table-row-hover: rgba(109, 94, 248, 0.14);
+  --footer-bg: rgba(8, 10, 19, 0.6);
+  --ring-track: rgba(255, 255, 255, 0.08);
+
+  /* Gradient dekoratif halaman */
+  --page-glow-1: rgba(109, 94, 248, 0.26);
+  --page-glow-2: rgba(56, 189, 248, 0.16);
+  --page-glow-3: rgba(167, 139, 250, 0.12);
+  --auth-glow-1: rgba(109, 94, 248, 0.3);
+  --auth-glow-2: rgba(56, 189, 248, 0.16);
+  --card-glow: rgba(109, 94, 248, 0.3);
+  --card-glow-soft: rgba(109, 94, 248, 0.55);
+
+  /* Shadow */
+  --shadow: 0 18px 40px -24px rgba(0, 0, 0, 0.9);
+  --shadow-md: 0 14px 30px -20px rgba(0, 0, 0, 0.85);
+  --shadow-lg:
+    0 30px 60px -30px rgba(0, 0, 0, 0.95),
+    0 0 0 1px var(--glass-border);
+  --shadow-glow: 0 0 44px -18px rgba(109, 94, 248, 0.75);
+  --shadow-glow-strong: 0 0 60px -14px rgba(109, 94, 248, 0.85);
+  --shadow-bar: 0 18px 40px -32px rgba(0, 0, 0, 0.95);
+}
+
+/* ==========================================================
+   3. Light Mode
+   ========================================================== */
+[data-theme='light'] {
+  color-scheme: light;
+
+  /* Core */
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --surface-hover: #f1f5f9;
+  --border: #e2e8f0;
+
+  --text-h: #0f172a;
+  --text: #475569;
+  --placeholder: #64748b;
+  --on-primary: #ffffff;
+  /* Putih di atas gradient status yang sudah digelapkan */
+  --on-status: #ffffff;
+
+  /* Gradients
+     Ujung gradasi ditahan gelap agar teks putih di atasnya tetap
+     memenuhi WCAG AA (4.5:1) di atas latar putih. */
+  --gradient-primary: linear-gradient(135deg, #6d5ef8 0%, #5b4bd6 100%);
+  --gradient-primary-soft: linear-gradient(135deg, rgba(91, 75, 214, 0.14), rgba(139, 124, 249, 0.05));
+
+  /* Accent dinaikkan agar kontras teks di atas putih tetap WCAG AA */
+  --accent: #4c3fd0;
+  --accent-bg: rgba(109, 94, 248, 0.1);
+  --accent-border: rgba(91, 75, 214, 0.35);
+
+  /* Status
+     Warna solid digelapkan agar teks putih (--on-status) di atasnya
+     tetap >= 4.5:1; *-text untuk teks kecil di atas tint pucat. */
+  --success: #15803d;
+  --success-alt: #0f766e;
+  --success-text: #14532d;
+  --success-bg: rgba(22, 163, 74, 0.12);
+  --success-border: rgba(22, 163, 74, 0.4);
+
+  --warning: #ca8a04;
+  --warning-alt: #b45309;
+  --warning-text: #713f12;
+  --warning-bg: rgba(202, 138, 4, 0.14);
+  --warning-border: rgba(202, 138, 4, 0.4);
+
+  --danger: #dc2626;
+  --danger-alt: #c2410c;
+  --danger-text: #991b1b;
+  --danger-bg: rgba(220, 38, 38, 0.1);
+  --danger-border: rgba(220, 38, 38, 0.4);
+
+  --info: #0284c7;
+  --info-alt: #4f46e5;
+  --info-text: #075985;
+  --info-bg: rgba(2, 132, 199, 0.1);
+  --info-border: rgba(2, 132, 199, 0.35);
+
+  /* Warna mata pelajaran */
+  --blue: #075985;
+  --blue-bg: rgba(2, 132, 199, 0.1);
+  --blue-border: rgba(2, 132, 199, 0.35);
+
+  --green: #14532d;
+  --green-bg: rgba(21, 128, 61, 0.1);
+  --green-border: rgba(21, 128, 61, 0.35);
+
+  --purple: #5b21b6;
+  --purple-bg: rgba(109, 40, 217, 0.09);
+  --purple-border: rgba(109, 40, 217, 0.32);
+
+  --orange: #9a3412;
+  --orange-bg: rgba(194, 65, 12, 0.09);
+  --orange-border: rgba(194, 65, 12, 0.32);
+
+  /* Lapisan transparan */
+  --veil: rgba(15, 23, 42, 0.03);
+  --veil-hover: rgba(15, 23, 42, 0.05);
+  --field-bg: #ffffff;
+  --field-border: #cbd5e1;
+  --track-bg: rgba(15, 23, 42, 0.07);
+  --skeleton-bg: rgba(15, 23, 42, 0.08);
+  --sheen: rgba(15, 23, 42, 0.05);
+  --ripple: rgba(91, 75, 214, 0.35);
+  --scrollbar: rgba(91, 75, 214, 0.28);
+  --scrollbar-hover: rgba(91, 75, 214, 0.5);
+  --noise-opacity: 0.02;
+
+  --focus-ring: var(--primary);
+  --focus-ring-offset: 2px;
+
+  /* White card + shadow lembut (bukan glassmorphism) */
+  --glass-bg: rgba(255, 255, 255, 0.92);
+  --glass-bg-strong: rgba(255, 255, 255, 0.97);
+  --glass-border: #e2e8f0;
+  --glass-blur: 12px;
+
+  /* Baris tetap */
+  --navbar-bg: rgba(255, 255, 255, 0.82);
+  --navbar-bg-scrolled: rgba(255, 255, 255, 0.95);
+  --table-head-bg: rgba(248, 250, 252, 0.95);
+  --table-zebra: rgba(15, 23, 42, 0.022);
+  --table-row-hover: rgba(109, 94, 248, 0.07);
+  --footer-bg: rgba(255, 255, 255, 0.78);
+  --ring-track: rgba(15, 23, 42, 0.1);
+
+  /* Gradient dekoratif: putih dengan gradient biru muda */
+  --page-glow-1: rgba(99, 102, 241, 0.12);
+  --page-glow-2: rgba(14, 165, 233, 0.14);
+  --page-glow-3: rgba(109, 94, 248, 0.08);
+  --auth-glow-1: rgba(59, 130, 246, 0.16);
+  --auth-glow-2: rgba(14, 165, 233, 0.12);
+  --card-glow: rgba(109, 94, 248, 0.16);
+  --card-glow-soft: rgba(109, 94, 248, 0.22);
+
+  /* Shadow lembut */
+  --shadow: 0 18px 40px -26px rgba(15, 23, 42, 0.25);
+  --shadow-md: 0 14px 30px -22px rgba(15, 23, 42, 0.2);
+  --shadow-lg:
+    0 30px 60px -34px rgba(15, 23, 42, 0.22),
+    0 0 0 1px rgba(15, 23, 42, 0.04);
+  --shadow-glow: 0 10px 30px -16px rgba(109, 94, 248, 0.45);
+  --shadow-glow-strong: 0 14px 36px -14px rgba(109, 94, 248, 0.5);
+  --shadow-bar: 0 12px 28px -24px rgba(15, 23, 42, 0.3);
+}
+
+/* ==========================================================
+   4. Alias kompatibilitas
+   ========================================================== */
+:root {
+  /* Nilai lama yang dipakai komponen eksisting */
+  --bg-soft: var(--surface);
+  --accent-2: var(--primary);
+}

@@ -119,10 +119,32 @@ function StudentHome() {
 
   return (
     <section className="student-home">
-      <header className="student-home__header">
-        <span className="student-home__badge">Ruang Siswa</span>
-        <h1 className="student-home__title">Halo, {name}!</h1>
-        <p className="student-home__subtitle">Belajar sesuai levelmu.</p>
+      <header className="student-home__header glass glass--glow">
+        <div className="student-home__intro">
+          <span className="student-home__badge">Ruang Siswa</span>
+          <h1 className="student-home__title">Halo, {name}!</h1>
+          <p className="student-home__subtitle">
+            Belajar sesuai levelmu dengan diagnostik dan AI Tutor.
+          </p>
+        </div>
+        <div className="student-home__visual" aria-hidden="true">
+          <svg viewBox="0 0 160 160" className="student-home__orb">
+            <defs>
+              <linearGradient id="aeOrb" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stopColor="#6D5EF8" />
+                <stop offset="100%" stopColor="#A78BFA" />
+              </linearGradient>
+            </defs>
+            <circle cx="80" cy="80" r="72" fill="none" stroke="url(#aeOrb)" strokeWidth="1.5" opacity="0.5" />
+            <circle cx="80" cy="80" r="52" fill="url(#aeOrb)" opacity="0.22" />
+            <rect x="52" y="60" width="56" height="44" rx="14" fill="url(#aeOrb)" opacity="0.9" />
+            <path d="M80 60V50" stroke="#A78BFA" strokeWidth="3" strokeLinecap="round" />
+            <circle cx="80" cy="46" r="5" fill="#A78BFA" />
+            <circle cx="70" cy="80" r="5" fill="#fff" />
+            <circle cx="90" cy="80" r="5" fill="#fff" />
+            <path d="M72 92h16" stroke="#fff" strokeWidth="4" strokeLinecap="round" />
+          </svg>
+        </div>
       </header>
 
       <div className="student-home__grid">

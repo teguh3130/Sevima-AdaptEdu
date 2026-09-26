@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext.jsx'
+import ThemeToggle from '../components/ThemeToggle.jsx'
 import './Login.css'
 
 function homeFor(role) {
@@ -60,16 +61,18 @@ function Login({ initialMode = 'login' }) {
 
   return (
     <section className="login">
-      <div className="login__card">
-        <span className="login__badge">AdaptEdu</span>
-        <h1 className="login__title">
-          {mode === 'login' ? 'Masuk ke akunmu' : 'Buat akun baru'}
-        </h1>
-        <p className="login__subtitle">
-          {mode === 'login'
-            ? 'Gunakan email untuk melanjutkan.'
-            : 'Daftar sebagai siswa atau guru.'}
-        </p>
+      <ThemeToggle className="login__theme" />
+      <div className="login__panel">
+        <div className="login__card glass glass--glow">
+          <span className="badge">AdaptEdu</span>
+          <h1 className="login__title">
+            {mode === 'login' ? 'Masuk ke akunmu' : 'Buat akun baru'}
+          </h1>
+          <p className="login__subtitle">
+            {mode === 'login'
+              ? 'Gunakan email untuk melanjutkan.'
+              : 'Daftar sebagai siswa atau guru.'}
+          </p>
 
         <div className="login__tabs" role="tablist">
           <button
@@ -158,6 +161,40 @@ function Login({ initialMode = 'login' }) {
                 : 'Daftar & Masuk'}
           </button>
         </form>
+        </div>
+
+        <aside className="login__aside" aria-hidden="true">
+          <div className="login__art">
+            <svg viewBox="0 0 200 200" className="login__art-orb">
+              <defs>
+                <linearGradient id="orbGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#6D5EF8" />
+                  <stop offset="100%" stopColor="#A78BFA" />
+                </linearGradient>
+              </defs>
+              <circle cx="100" cy="100" r="86" fill="url(#orbGrad)" opacity="0.25" />
+              <circle cx="100" cy="100" r="62" fill="url(#orbGrad)" opacity="0.55" />
+              <path
+                d="M70 96l20 20 40-44"
+                fill="none"
+                stroke="#fff"
+                strokeWidth="10"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <h2 className="login__art-title">Belajar smarter, bukan harder.</h2>
+            <p className="login__art-text">
+              Diagnostik otomatis, AI Tutor sesuai mata pelajaran, dan progres
+              belajar yang terpantau guru.
+            </p>
+            <ul className="login__art-points">
+              <li>Tes Diagnostik 4 mata pelajaran</li>
+              <li>AI Tutor fokus mapel</li>
+              <li>Dashboard guru real-time</li>
+            </ul>
+          </div>
+        </aside>
       </div>
     </section>
   )

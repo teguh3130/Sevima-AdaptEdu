@@ -11,8 +11,9 @@
   width: 42px;
   height: 42px;
   border-radius: 50%;
-  border: 3px solid var(--border);
+  border: 3px solid var(--track-bg);
   border-top-color: var(--accent);
+  box-shadow: 0 0 24px -6px var(--card-glow);
   animation: loading-spin 0.8s linear infinite;
 }
 

@@ -3,6 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import { collection, getDocs, limit, orderBy, query } from 'firebase/firestore'
 import { db } from '../lib/firebase.js'
 import { useAuth } from '../context/AuthContext.jsx'
+import ThemeToggle from './ThemeToggle.jsx'
 import './Navbar.css'
 
 const LEVELS = ['Dasar', 'Menengah', 'Lanjut']
@@ -28,11 +29,24 @@ function Navbar() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(
+    () => typeof window !== 'undefined' && window.scrollY > 8,
+  )
   const [level, setLevel] = useState(null)
   const [levelLoading, setLevelLoading] = useState(
     () => user?.role === 'student',
   )
   const menuRef = useRef(null)
+
+  useEffect(() => {
+    function handleScroll() {
+      setScrolled(window.scrollY > 8)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   useEffect(() => {
     if (!user || user.role !== 'student') return undefined
@@ -102,25 +116,49 @@ function Navbar() {
 
   async function handleLogout() {
     setOpen(false)
+    setMenuOpen(false)
     await logout()
     navigate('/login', { replace: true })
   }
 
   return (
-    <header className="navbar">
+    <header className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`}>
       <div className="navbar__inner">
-        <NavLink to="/" className="navbar__brand">
+        <NavLink to="/" className="navbar__brand" onClick={() => setMenuOpen(false)}>
           <span className="navbar__logo" aria-hidden="true">
             AE
           </span>
           AdaptEdu
         </NavLink>
-        <nav className="navbar__nav">
+
+        <button
+          type="button"
+          className={`navbar__burger ${menuOpen ? 'navbar__burger--open' : ''}`}
+          aria-label="Buka menu navigasi"
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((value) => !value)}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+
+        <nav className={`navbar__nav ${menuOpen ? 'navbar__nav--open' : ''}`}>
           {links.map((link) => (
-            <NavLink key={link.to} to={link.to} className="navbar__link">
+            <NavLink
+              key={link.to}
+              to={link.to}
+              className="navbar__link"
+              onClick={() => setMenuOpen(false)}
+            >
               {link.label}
             </NavLink>
           ))}
+
+          <ThemeToggle
+            variant="block"
+            className="navbar__theme navbar__theme--menu"
+          />
 
           <div className="navbar__profile" ref={menuRef}>
             <button
@@ -173,6 +211,8 @@ function Navbar() {
             Keluar
           </button>
         </nav>
+
+        <ThemeToggle className="navbar__theme navbar__theme--desktop" />
       </div>
     </header>
   )

@@ -5,14 +5,18 @@
   gap: 0.75rem;
   padding: clamp(4rem, 12vw, 7rem) 1rem;
   text-align: center;
+  animation: slide-up var(--dur-base) var(--ease) both;
 }
 
 .not-found__code {
   margin: 0;
   font-size: clamp(3rem, 12vw, 5.5rem);
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -2px;
-  color: var(--accent);
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .not-found__title {
@@ -23,11 +27,17 @@
 
 .not-found__link {
   margin-top: 0.5rem;
+  padding: 0.7rem 1.4rem;
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-md);
+  background: var(--accent-bg);
   color: var(--accent);
   text-decoration: none;
-  font-weight: 500;
+  font-weight: 600;
+  transition: transform var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
 }
 
 .not-found__link:hover {
-  text-decoration: underline;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
 }

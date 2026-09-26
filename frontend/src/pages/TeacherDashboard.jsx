@@ -223,12 +223,12 @@ function TeacherDashboard() {
           </>
         ) : (
           <>
-            <article className="stat">
+            <article className="stat stat--primary">
               <p className="stat__label">Total Siswa</p>
               <p className="stat__value">{stats.total}</p>
             </article>
 
-            <article className="stat">
+            <article className="stat stat--info">
               <p className="stat__label">Rata-rata Skor Diagnostik</p>
               <p className="stat__value">
                 {stats.average.toFixed(1)}
@@ -236,7 +236,7 @@ function TeacherDashboard() {
               </p>
             </article>
 
-            <article className="stat">
+            <article className="stat stat--success">
               <p className="stat__label">Tes per Mata Pelajaran</p>
               <ul className="stat__levels">
                 {SUBJECTS.map((subject) => (
@@ -254,7 +254,7 @@ function TeacherDashboard() {
               </ul>
             </article>
 
-            <article className="stat">
+            <article className="stat stat--warning">
               <p className="stat__label">Siswa per Level</p>
               <ul className="stat__levels">
                 {LEVELS.map((level) => (

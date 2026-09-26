@@ -138,6 +138,17 @@ function AiTutor() {
                 message.role === 'user' ? 'bubble--user' : 'bubble--assistant'
               }`}
             >
+              {message.role !== 'user' && (
+                <span className="bubble__avatar" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="4" y="8" width="16" height="12" rx="3" />
+                    <path d="M12 8V5" />
+                    <circle cx="9" cy="13.5" r="1" />
+                    <circle cx="15" cy="13.5" r="1" />
+                    <path d="M9.5 17h5" />
+                  </svg>
+                </span>
+              )}
               <p className="bubble__text">{message.text}</p>
             </div>
           ))}

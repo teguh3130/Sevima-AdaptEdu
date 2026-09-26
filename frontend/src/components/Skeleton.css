@@ -2,8 +2,8 @@
   position: relative;
   display: block;
   overflow: hidden;
-  background: var(--border);
-  border-radius: 8px;
+  background: var(--skeleton-bg);
+  border-radius: 10px;
 }
 
 .skeleton::after {
@@ -14,7 +14,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.07),
+    var(--veil-hover),
     transparent
   );
   animation: skeleton-shimmer 1.2s infinite;

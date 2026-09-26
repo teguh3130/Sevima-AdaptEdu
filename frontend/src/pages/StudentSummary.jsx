@@ -7,10 +7,11 @@ import { SUBJECTS, isValidSubject, subjectName } from '../data/subjects.js'
 import './StudentSummary.css'
 
 const LEVELS = ['Dasar', 'Menengah', 'Lanjut']
+// Warna ring memakai token tema agar ikut berubah saat Light/Dark Mode
 const LEVEL_COLORS = {
-  Dasar: '#ef4444',
-  Menengah: '#eab308',
-  Lanjut: '#22c55e',
+  Dasar: 'var(--danger)',
+  Menengah: 'var(--warning)',
+  Lanjut: 'var(--success)',
 }
 const FETCH_LIMIT = 30
 
