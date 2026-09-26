@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../lib/firebase.js'
+import { useAuth } from '../context/AuthContext.jsx'
+import '../components/Skeleton.css'
 import './TeacherDashboard.css'
 
 const FILTERS = ['Semua', 'Dasar', 'Menengah', 'Lanjut']
 const LEVELS = ['Dasar', 'Menengah', 'Lanjut']
+const SKELETON_ROWS = 5
 
 function levelFromScore(score, total = 5) {
   const ratio = typeof score === 'number' ? score / total : 0
@@ -32,11 +35,41 @@ function formatDate(value) {
   }).format(date)
 }
 
+function StatSkeleton() {
+  return (
+    <article className="stat" aria-hidden="true">
+      <span className="skeleton skeleton--text" style={{ width: '55%' }} />
+      <span
+        className="skeleton skeleton--title"
+        style={{ marginTop: '0.7rem', width: '40%' }}
+      />
+    </article>
+  )
+}
+
+function TableSkeleton() {
+  return (
+    <div className="table-skeleton" aria-hidden="true">
+      {Array.from({ length: SKELETON_ROWS }).map((_, index) => (
+        <div className="table-skeleton__row" key={index}>
+          <span className="skeleton skeleton--text" />
+          <span className="skeleton skeleton--text" style={{ width: '35%' }} />
+          <span className="skeleton skeleton--text" style={{ width: '30%' }} />
+          <span className="skeleton skeleton--text" style={{ width: '55%' }} />
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function TeacherDashboard() {
+  const { user } = useAuth()
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [filter, setFilter] = useState('Semua')
+  const [search, setSearch] = useState('')
+  const [reloadKey, setReloadKey] = useState(0)
 
   useEffect(() => {
     let cancelled = false
@@ -69,7 +102,7 @@ function TeacherDashboard() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [reloadKey])
 
   const stats = useMemo(() => {
     const total = rows.length
@@ -83,17 +116,45 @@ function TeacherDashboard() {
     return { total, average, byLevel }
   }, [rows])
 
-  const visibleRows =
-    filter === 'Semua' ? rows : rows.filter((row) => resolveLevel(row) === filter)
+  const keyword = search.trim().toLowerCase()
+
+  const visibleRows = rows.filter((row) => {
+    const matchesLevel = filter === 'Semua' || resolveLevel(row) === filter
+    const matchesName =
+      !keyword || String(row.name || '').toLowerCase().includes(keyword)
+    return matchesLevel && matchesName
+  })
+
+  const teacherName = user?.email?.split('@')[0] || 'Guru'
 
   return (
     <section className="dashboard">
       <header className="dashboard__header">
-        <span className="dashboard__badge">Dashboard Guru</span>
-        <p className="dashboard__subtitle">
-          Ringkasan hasil Tes Diagnostik dari Firestore.
-        </p>
+        <div className="dashboard__heading">
+          <span className="dashboard__badge">Dashboard Guru</span>
+          <h1 className="dashboard__title">Halo, {teacherName}!</h1>
+          <p className="dashboard__subtitle">Pantau perkembangan siswa.</p>
+        </div>
       </header>
+
+      <div className="dashboard__toolbar">
+        <input
+          type="search"
+          className="dashboard__search"
+          placeholder="Cari nama siswa..."
+          aria-label="Cari nama siswa"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+        />
+        <button
+          type="button"
+          className="chip dashboard__refresh"
+          onClick={() => setReloadKey((key) => key + 1)}
+          disabled={loading}
+        >
+          {loading ? 'Memuat...' : 'Refresh Data'}
+        </button>
+      </div>
 
       <div className="dashboard__filters" role="group" aria-label="Filter level">
         {FILTERS.map((item) => (
@@ -109,35 +170,50 @@ function TeacherDashboard() {
       </div>
 
       <div className="stats">
-        <article className="stat">
-          <p className="stat__label">Total Siswa</p>
-          <p className="stat__value">{stats.total}</p>
-        </article>
+        {loading ? (
+          <>
+            <StatSkeleton />
+            <StatSkeleton />
+            <StatSkeleton />
+          </>
+        ) : (
+          <>
+            <article className="stat">
+              <p className="stat__label">Total Siswa</p>
+              <p className="stat__value">{stats.total}</p>
+            </article>
 
-        <article className="stat">
-          <p className="stat__label">Rata-rata Skor Diagnostik</p>
-          <p className="stat__value">
-            {stats.average.toFixed(1)}
-            <span className="stat__suffix">/5</span>
-          </p>
-        </article>
+            <article className="stat">
+              <p className="stat__label">Rata-rata Skor Diagnostik</p>
+              <p className="stat__value">
+                {stats.average.toFixed(1)}
+                <span className="stat__suffix">/5</span>
+              </p>
+            </article>
 
-        <article className="stat">
-          <p className="stat__label">Siswa per Level</p>
-          <ul className="stat__levels">
-            {LEVELS.map((level) => (
-              <li key={level} className={`level-pill level-pill--${level.toLowerCase()}`}>
-                <span>{level}</span>
-                <strong>{stats.byLevel[level]}</strong>
-              </li>
-            ))}
-          </ul>
-        </article>
+            <article className="stat">
+              <p className="stat__label">Siswa per Level</p>
+              <ul className="stat__levels">
+                {LEVELS.map((level) => (
+                  <li
+                    key={level}
+                    className={`level-pill level-pill--${level.toLowerCase()}`}
+                  >
+                    <span>{level}</span>
+                    <strong>{stats.byLevel[level]}</strong>
+                  </li>
+                ))}
+              </ul>
+            </article>
+          </>
+        )}
       </div>
 
       <div className="table-wrap">
-        {loading && <p className="dashboard__status">Memuat data Firestore...</p>}
-        {error && <p className="dashboard__status dashboard__status--error">{error}</p>}
+        {loading && <TableSkeleton />}
+        {error && (
+          <p className="dashboard__status dashboard__status--error">{error}</p>
+        )}
 
         {!loading && !error && (
           <table className="table">
@@ -153,7 +229,9 @@ function TeacherDashboard() {
               {visibleRows.length === 0 && (
                 <tr>
                   <td colSpan="4" className="table__empty">
-                    Belum ada data untuk filter "{filter}".
+                    {keyword
+                      ? `Tidak ada siswa bernama "${search.trim()}".`
+                      : `Belum ada data untuk filter "${filter}".`}
                   </td>
                 </tr>
               )}
