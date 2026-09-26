@@ -5,6 +5,7 @@ import questions from '../data/questions.js'
 import './DiagnosticTest.css'
 
 const TOTAL = questions.length
+const API_BASE = import.meta.env.VITE_API_BASE_URL || ''
 
 function DiagnosticTest() {
   const [index, setIndex] = useState(0)
@@ -13,6 +14,8 @@ function DiagnosticTest() {
   const [score, setScore] = useState(0)
   const [finished, setFinished] = useState(false)
   const [saveState, setSaveState] = useState('idle')
+  const [analysis, setAnalysis] = useState(null)
+  const [analysisState, setAnalysisState] = useState('idle')
 
   const current = questions[index]
   const isLast = index === TOTAL - 1
@@ -38,6 +41,24 @@ function DiagnosticTest() {
     }
   }
 
+  async function fetchAnalysis(finalScore) {
+    setAnalysisState('loading')
+    try {
+      const response = await fetch(`${API_BASE}/api/analyze-score`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ score: finalScore, total: TOTAL }),
+      })
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      const data = await response.json()
+      setAnalysis(data)
+      setAnalysisState('done')
+    } catch (error) {
+      console.error('Gagal menganalisis skor:', error)
+      setAnalysisState('error')
+    }
+  }
+
   function handleNext() {
     const nextAnswers = [...answers, selected]
     setAnswers(nextAnswers)
@@ -50,6 +71,7 @@ function DiagnosticTest() {
       setScore(finalScore)
       setFinished(true)
       saveScore(finalScore)
+      fetchAnalysis(finalScore)
       return
     }
 
@@ -64,6 +86,8 @@ function DiagnosticTest() {
     setScore(0)
     setFinished(false)
     setSaveState('idle')
+    setAnalysis(null)
+    setAnalysisState('idle')
   }
 
   if (finished) {
@@ -82,6 +106,24 @@ function DiagnosticTest() {
               ? 'Bagus! Sebagian besar jawabanmu benar.'
               : 'Terus belajar materi pecahan, ya!'}
         </p>
+        <div className="analysis">
+          {analysisState === 'loading' && (
+            <p className="analysis__status">Gemini sedang menganalisis skor...</p>
+          )}
+          {analysis && (
+            <>
+              <span
+                className={`analysis__badge analysis__badge--${analysis.level.toLowerCase()}`}
+              >
+                {analysis.level}
+              </span>
+              <p className="analysis__reason">{analysis.reason}</p>
+            </>
+          )}
+          {analysisState === 'error' && (
+            <p className="analysis__status">Analisis Gemini gagal dijalankan.</p>
+          )}
+        </div>
         <p className="result__save">
           {saveState === 'saving' && 'Menyimpan skor ke Firestore...'}
           {saveState === 'saved' && 'Skor tersimpan di Firestore.'}
