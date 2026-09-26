@@ -16,6 +16,9 @@ function DiagnosticTest() {
   const [saveState, setSaveState] = useState('idle')
   const [analysis, setAnalysis] = useState(null)
   const [analysisState, setAnalysisState] = useState('idle')
+  const [practice, setPractice] = useState(null)
+  const [practiceLoading, setPracticeLoading] = useState(false)
+  const [practiceError, setPracticeError] = useState('')
 
   const current = questions[index]
   const isLast = index === TOTAL - 1
@@ -59,6 +62,60 @@ function DiagnosticTest() {
     }
   }
 
+  async function startPractice() {
+    setPracticeLoading(true)
+    setPracticeError('')
+    try {
+      const response = await fetch(`${API_BASE}/api/practice`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ level: analysis?.level }),
+      })
+      if (!response.ok) throw new Error(`HTTP ${response.status}`)
+      const data = await response.json()
+      setPractice({
+        level: data.level,
+        questions: data.questions,
+        index: 0,
+        selected: null,
+        revealed: false,
+        score: 0,
+        finished: false,
+      })
+    } catch (error) {
+      console.error('Gagal memuat latihan:', error)
+      setPracticeError('Gagal memuat latihan dari Gemini. Silakan coba lagi.')
+    } finally {
+      setPracticeLoading(false)
+    }
+  }
+
+  function selectPracticeOption(optionIndex) {
+    if (!practice || practice.revealed) return
+    const question = practice.questions[practice.index]
+    const correctIndex = question.answer.charCodeAt(0) - 65
+    setPractice({
+      ...practice,
+      selected: optionIndex,
+      revealed: true,
+      score: practice.score + (optionIndex === correctIndex ? 1 : 0),
+    })
+  }
+
+  function nextPractice() {
+    const isLastPractice = practice.index === practice.questions.length - 1
+    if (isLastPractice) {
+      setPractice({ ...practice, finished: true })
+      return
+    }
+    setPractice({
+      ...practice,
+      index: practice.index + 1,
+      selected: null,
+      revealed: false,
+    })
+  }
+
   function handleNext() {
     const nextAnswers = [...answers, selected]
     setAnswers(nextAnswers)
@@ -88,9 +145,139 @@ function DiagnosticTest() {
     setSaveState('idle')
     setAnalysis(null)
     setAnalysisState('idle')
+    setPractice(null)
+    setPracticeLoading(false)
+    setPracticeError('')
   }
 
   if (finished) {
+    if (practice) {
+      const practiceQuestion = practice.questions[practice.index]
+      const correctIndex = practiceQuestion.answer.charCodeAt(0) - 65
+      const isLastPractice = practice.index === practice.questions.length - 1
+      const isCorrect = practice.selected === correctIndex
+
+      if (practice.finished) {
+        return (
+          <section className="test result">
+            <span className="result__badge">Latihan Selesai</span>
+            <p className="result__score">
+              {practice.score}
+              <span>/{practice.questions.length}</span>
+            </p>
+            <h1 className="result__title">Skor Latihan</h1>
+            <p className="result__message">
+              Latihan level {practice.level} selesai. Mau lanjut soal baru?
+            </p>
+            <div className="test__actions test__actions--center">
+              <button
+                type="button"
+                className="btn btn--primary"
+                onClick={startPractice}
+                disabled={practiceLoading}
+              >
+                Latihan Selanjutnya
+              </button>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={() => setPractice(null)}
+              >
+                Kembali ke Hasil
+              </button>
+            </div>
+          </section>
+        )
+      }
+
+      return (
+        <section className="test">
+          <header className="test__header">
+            <span className="test__badge">Latihan - {practice.level}</span>
+            <p className="test__counter">
+              Soal {practice.index + 1} dari {practice.questions.length}
+            </p>
+          </header>
+
+          <div
+            className="progress"
+            role="progressbar"
+            aria-valuenow={Math.round(
+              ((practice.index + (practice.revealed ? 1 : 0)) /
+                practice.questions.length) *
+                100,
+            )}
+            aria-valuemin="0"
+            aria-valuemax="100"
+          >
+            <div
+              className="progress__fill"
+              style={{
+                width: `${((practice.index + (practice.revealed ? 1 : 0)) / practice.questions.length) * 100}%`,
+              }}
+            />
+          </div>
+
+          <div className="test__card">
+            <h1 className="test__question">{practiceQuestion.question}</h1>
+            <ul className="test__options">
+              {practiceQuestion.options.map((option, optionIndex) => {
+                let stateClass = ''
+                if (practice.revealed) {
+                  if (optionIndex === correctIndex) stateClass = ' option--correct'
+                  else if (optionIndex === practice.selected)
+                    stateClass = ' option--wrong'
+                } else if (optionIndex === practice.selected) {
+                  stateClass = ' option--selected'
+                }
+
+                return (
+                  <li key={`${practice.index}-${optionIndex}`}>
+                    <button
+                      type="button"
+                      className={`option${stateClass}`}
+                      onClick={() => selectPracticeOption(optionIndex)}
+                      disabled={practice.revealed}
+                    >
+                      <span className="option__label">
+                        {String.fromCharCode(65 + optionIndex)}
+                      </span>
+                      <span>{option}</span>
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+
+            {practice.revealed && (
+              <p
+                className={`practice__feedback ${
+                  isCorrect
+                    ? 'practice__feedback--ok'
+                    : 'practice__feedback--no'
+                }`}
+              >
+                {isCorrect
+                  ? 'Benar!'
+                  : `Salah. Jawaban benar: ${practiceQuestion.answer} - ${practiceQuestion.options[correctIndex]}`}
+              </p>
+            )}
+          </div>
+
+          <div className="test__actions">
+            <button
+              type="button"
+              className="btn btn--primary"
+              onClick={nextPractice}
+              disabled={!practice.revealed}
+            >
+              {isLastPractice ? 'Lihat Hasil' : 'Soal Berikutnya'}
+            </button>
+          </div>
+        </section>
+      )
+    }
+
     return (
       <section className="test result">
         <span className="result__badge">Selesai</span>
@@ -131,9 +318,26 @@ function DiagnosticTest() {
             'Skor gagal disimpan. Periksa konfigurasi Firebase.'}
           {saveState === 'idle' && ''}
         </p>
-        <button type="button" className="btn btn--primary" onClick={handleRestart}>
-          Ulangi Tes
-        </button>
+        <div className="test__actions test__actions--center">
+          <button
+            type="button"
+            className="btn btn--primary"
+            onClick={startPractice}
+            disabled={practiceLoading || analysisState === 'loading'}
+          >
+            {practiceLoading ? 'Menyiapkan latihan...' : 'Latihan Selanjutnya'}
+          </button>
+          <button
+            type="button"
+            className="btn btn--ghost"
+            onClick={handleRestart}
+          >
+            Ulangi Tes
+          </button>
+        </div>
+        {practiceError && (
+          <p className="analysis__status practice__error">{practiceError}</p>
+        )}
       </section>
     )
   }
