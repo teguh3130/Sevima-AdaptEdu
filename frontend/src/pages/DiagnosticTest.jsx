@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
+import { addDoc, collection, serverTimestamp, updateDoc } from 'firebase/firestore'
 import { db } from '../lib/firebase.js'
 import questions from '../data/questions.js'
 import './DiagnosticTest.css'
@@ -19,6 +19,8 @@ function DiagnosticTest() {
   const [practice, setPractice] = useState(null)
   const [practiceLoading, setPracticeLoading] = useState(false)
   const [practiceError, setPracticeError] = useState('')
+  const [name, setName] = useState('')
+  const [started, setStarted] = useState(false)
 
   const current = questions[index]
   const isLast = index === TOTAL - 1
@@ -32,19 +34,23 @@ function DiagnosticTest() {
   async function saveScore(finalScore) {
     setSaveState('saving')
     try {
-      await addDoc(collection(db, 'diagnosticScores'), {
+      const docRef = await addDoc(collection(db, 'diagnosticScores'), {
+        name: name.trim() || 'Tanpa Nama',
         score: finalScore,
         total: TOTAL,
+        level: null,
         createdAt: serverTimestamp(),
       })
       setSaveState('saved')
+      return docRef
     } catch (error) {
       console.error('Gagal menyimpan skor:', error)
       setSaveState('error')
+      return null
     }
   }
 
-  async function fetchAnalysis(finalScore) {
+  async function fetchAnalysis(finalScore, docRef) {
     setAnalysisState('loading')
     try {
       const response = await fetch(`${API_BASE}/api/analyze-score`, {
@@ -56,6 +62,14 @@ function DiagnosticTest() {
       const data = await response.json()
       setAnalysis(data)
       setAnalysisState('done')
+
+      if (docRef && data.level) {
+        try {
+          await updateDoc(docRef, { level: data.level })
+        } catch (error) {
+          console.error('Gagal menyimpan level:', error)
+        }
+      }
     } catch (error) {
       console.error('Gagal menganalisis skor:', error)
       setAnalysisState('error')
@@ -116,7 +130,7 @@ function DiagnosticTest() {
     })
   }
 
-  function handleNext() {
+  async function handleNext() {
     const nextAnswers = [...answers, selected]
     setAnswers(nextAnswers)
 
@@ -127,8 +141,8 @@ function DiagnosticTest() {
       )
       setScore(finalScore)
       setFinished(true)
-      saveScore(finalScore)
-      fetchAnalysis(finalScore)
+      const docRef = await saveScore(finalScore)
+      fetchAnalysis(finalScore, docRef)
       return
     }
 
@@ -148,6 +162,47 @@ function DiagnosticTest() {
     setPractice(null)
     setPracticeLoading(false)
     setPracticeError('')
+  }
+
+  if (!started) {
+    return (
+      <section className="test">
+        <header className="test__header">
+          <span className="test__badge">Tes Diagnostik</span>
+          <p className="test__counter">{TOTAL} soal pecahan</p>
+        </header>
+
+        <div className="test__card">
+          <h1 className="test__question">Sebelum mulai, siapa namamu?</h1>
+          <p className="intro__hint">
+            Nama ini dipakai di dashboard guru untuk menampilkan hasil tesmu.
+          </p>
+          <form
+            className="intro__form"
+            onSubmit={(event) => {
+              event.preventDefault()
+              if (name.trim()) setStarted(true)
+            }}
+          >
+            <input
+              className="intro__input"
+              type="text"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="Nama siswa"
+              aria-label="Nama siswa"
+            />
+            <button
+              className="btn btn--primary"
+              type="submit"
+              disabled={!name.trim()}
+            >
+              Mulai Tes
+            </button>
+          </form>
+        </div>
+      </section>
+    )
   }
 
   if (finished) {

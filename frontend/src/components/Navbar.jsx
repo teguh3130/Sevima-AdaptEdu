@@ -21,6 +21,9 @@ function Navbar() {
           <NavLink to="/ai-tutor" className="navbar__link">
             AI Tutor
           </NavLink>
+          <NavLink to="/dashboard-guru" className="navbar__link">
+            Dashboard Guru
+          </NavLink>
         </nav>
       </div>
     </header>

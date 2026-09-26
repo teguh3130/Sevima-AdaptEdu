@@ -156,6 +156,38 @@
   color: #ef4444;
 }
 
+.intro__hint {
+  margin: 0 0 1rem;
+  color: var(--text);
+}
+
+.intro__form {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.intro__input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.7rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+  font-size: 0.97rem;
+}
+
+.intro__input::placeholder {
+  color: var(--text);
+}
+
+@media (max-width: 560px) {
+  .intro__form {
+    flex-direction: column;
+  }
+}
+
 .test__actions {
   display: flex;
   justify-content: flex-end;
