@@ -2,12 +2,17 @@ import { useEffect, useMemo, useState } from 'react'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../lib/firebase.js'
 import { useAuth } from '../context/AuthContext.jsx'
+import { SUBJECTS, isValidSubject, subjectName } from '../data/subjects.js'
 import '../components/Skeleton.css'
 import './TeacherDashboard.css'
 
 const FILTERS = ['Semua', 'Dasar', 'Menengah', 'Lanjut']
 const LEVELS = ['Dasar', 'Menengah', 'Lanjut']
 const SKELETON_ROWS = 5
+
+function subjectOf(row) {
+  return isValidSubject(row.subject) ? row.subject : 'matematika'
+}
 
 function levelFromScore(score, total = 5) {
   const ratio = typeof score === 'number' ? score / total : 0
@@ -53,6 +58,7 @@ function TableSkeleton() {
       {Array.from({ length: SKELETON_ROWS }).map((_, index) => (
         <div className="table-skeleton__row" key={index}>
           <span className="skeleton skeleton--text" />
+          <span className="skeleton skeleton--text" style={{ width: '55%' }} />
           <span className="skeleton skeleton--text" style={{ width: '35%' }} />
           <span className="skeleton skeleton--text" style={{ width: '30%' }} />
           <span className="skeleton skeleton--text" style={{ width: '55%' }} />
@@ -68,6 +74,7 @@ function TeacherDashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [filter, setFilter] = useState('Semua')
+  const [subjectFilter, setSubjectFilter] = useState('semua')
   const [search, setSearch] = useState('')
   const [reloadKey, setReloadKey] = useState(0)
 
@@ -113,16 +120,30 @@ function TeacherDashboard() {
     rows.forEach((row) => {
       byLevel[resolveLevel(row)] += 1
     })
-    return { total, average, byLevel }
+    const bySubject = {}
+    SUBJECTS.forEach((subject) => {
+      bySubject[subject.id] = { count: 0, average: 0, sum: 0 }
+    })
+    rows.forEach((row) => {
+      const bucket = bySubject[subjectOf(row)]
+      bucket.count += 1
+      bucket.sum += Number(row.score) || 0
+    })
+    Object.values(bySubject).forEach((bucket) => {
+      bucket.average = bucket.count ? bucket.sum / bucket.count : 0
+    })
+    return { total, average, byLevel, bySubject }
   }, [rows])
 
   const keyword = search.trim().toLowerCase()
 
   const visibleRows = rows.filter((row) => {
     const matchesLevel = filter === 'Semua' || resolveLevel(row) === filter
+    const matchesSubject =
+      subjectFilter === 'semua' || subjectOf(row) === subjectFilter
     const matchesName =
       !keyword || String(row.name || '').toLowerCase().includes(keyword)
-    return matchesLevel && matchesName
+    return matchesLevel && matchesSubject && matchesName
   })
 
   const teacherName = user?.email?.split('@')[0] || 'Guru'
@@ -154,6 +175,30 @@ function TeacherDashboard() {
         >
           {loading ? 'Memuat...' : 'Refresh Data'}
         </button>
+      </div>
+
+      <div
+        className="dashboard__filters"
+        role="group"
+        aria-label="Filter mata pelajaran"
+      >
+        <button
+          type="button"
+          className={`chip ${subjectFilter === 'semua' ? 'chip--active' : ''}`}
+          onClick={() => setSubjectFilter('semua')}
+        >
+          Semua Mapel
+        </button>
+        {SUBJECTS.map((subject) => (
+          <button
+            key={subject.id}
+            type="button"
+            className={`chip ${subjectFilter === subject.id ? 'chip--active' : ''}`}
+            onClick={() => setSubjectFilter(subject.id)}
+          >
+            {subject.name}
+          </button>
+        ))}
       </div>
 
       <div className="dashboard__filters" role="group" aria-label="Filter level">
@@ -192,6 +237,24 @@ function TeacherDashboard() {
             </article>
 
             <article className="stat">
+              <p className="stat__label">Tes per Mata Pelajaran</p>
+              <ul className="stat__levels">
+                {SUBJECTS.map((subject) => (
+                  <li
+                    key={subject.id}
+                    className={`subject-stat subject-stat--${subject.color}`}
+                  >
+                    <span>{subject.name}</span>
+                    <strong>
+                      {stats.bySubject[subject.id].count} tes · avg{' '}
+                      {stats.bySubject[subject.id].average.toFixed(1)}
+                    </strong>
+                  </li>
+                ))}
+              </ul>
+            </article>
+
+            <article className="stat">
               <p className="stat__label">Siswa per Level</p>
               <ul className="stat__levels">
                 {LEVELS.map((level) => (
@@ -220,6 +283,7 @@ function TeacherDashboard() {
             <thead>
               <tr>
                 <th>Nama</th>
+                <th>Mapel</th>
                 <th>Skor</th>
                 <th>Level</th>
                 <th>Waktu Tes</th>
@@ -228,7 +292,7 @@ function TeacherDashboard() {
             <tbody>
               {visibleRows.length === 0 && (
                 <tr>
-                  <td colSpan="4" className="table__empty">
+                  <td colSpan="5" className="table__empty">
                     {keyword
                       ? `Tidak ada siswa bernama "${search.trim()}".`
                       : `Belum ada data untuk filter "${filter}".`}
@@ -238,6 +302,7 @@ function TeacherDashboard() {
               {visibleRows.map((row) => (
                 <tr key={row.id}>
                   <td data-label="Nama">{row.name || '-'}</td>
+                  <td data-label="Mapel">{subjectName(subjectOf(row))}</td>
                   <td data-label="Skor">
                     {row.score ?? '-'} / {row.total || 5}
                   </td>

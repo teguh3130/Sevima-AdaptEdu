@@ -1,23 +1,51 @@
 import { useEffect, useRef, useState } from 'react'
+import { useLocation } from 'react-router-dom'
+import {
+  SUBJECTS,
+  getStoredSubject,
+  isValidSubject,
+  storeSubject,
+  subjectName,
+} from '../data/subjects.js'
 import './AiTutor.css'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || ''
 
-const WELCOME = {
-  role: 'assistant',
-  text: 'Halo! Aku tutor matematikamu. Ketik pertanyaanmu tentang pecahan, operasi hitung, atau materi SMP lainnya.',
+function welcomeFor(name) {
+  return {
+    role: 'assistant',
+    welcome: true,
+    text: `Halo! Aku tutor ${name} kamu. Ketik pertanyaanmu tentang materi ${name} SMP.`,
+  }
 }
 
 function AiTutor() {
-  const [messages, setMessages] = useState([WELCOME])
+  const location = useLocation()
+  const [subject, setSubject] = useState(() => {
+    const fromQuery = new URLSearchParams(location.search).get('subject')
+    return isValidSubject(fromQuery) ? fromQuery : getStoredSubject()
+  })
+  const [messages, setMessages] = useState(() =>
+    welcomeFor(subjectName(subject)),
+  )
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [pickerOpen, setPickerOpen] = useState(false)
   const bottomRef = useRef(null)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
+
+  function changeSubject(nextSubject) {
+    storeSubject(nextSubject)
+    setSubject(nextSubject)
+    setMessages([welcomeFor(subjectName(nextSubject))])
+    setError('')
+    setInput('')
+    setPickerOpen(false)
+  }
 
   async function handleSend(event) {
     event.preventDefault()
@@ -35,8 +63,9 @@ function AiTutor() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: text,
+          subject,
           history: messages
-            .filter((message) => message !== WELCOME)
+            .filter((message) => !message.welcome)
             .map((message) => ({
               role: message.role === 'assistant' ? 'model' : 'user',
               text: message.text,
@@ -61,8 +90,44 @@ function AiTutor() {
     <section className="tutor">
       <header className="tutor__header">
         <span className="tutor__badge">AI Tutor</span>
-        <p className="tutor__subtitle">Tanya materi Matematika SMP, dijawab oleh Gemini.</p>
+        <p className="tutor__subtitle">
+          Tanya materi {subjectName(subject)} SMP, dijawab oleh Gemini.
+        </p>
       </header>
+
+      <div className="tutor__subject">
+        <span className="tutor__subject-label">
+          Mata Pelajaran Aktif: <strong>{subjectName(subject)}</strong>
+        </span>
+        <div className="tutor__subject-wrap">
+          <button
+            type="button"
+            className="chip"
+            aria-expanded={pickerOpen}
+            onClick={() => setPickerOpen((value) => !value)}
+          >
+            Ganti Mapel
+          </button>
+
+          {pickerOpen && (
+            <div className="subject-picker" role="menu">
+              {SUBJECTS.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`subject-picker__item${
+                    item.id === subject ? ' subject-picker__item--active' : ''
+                  }`}
+                  role="menuitem"
+                  onClick={() => changeSubject(item.id)}
+                >
+                  {item.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
 
       <div className="chat">
         <div className="chat__messages" aria-live="polite">
@@ -97,7 +162,7 @@ function AiTutor() {
             type="text"
             value={input}
             onChange={(event) => setInput(event.target.value)}
-            placeholder="Tulis pertanyaanmu..."
+            placeholder={`Tulis pertanyaanmu tentang ${subjectName(subject)}...`}
             aria-label="Pesan"
             disabled={loading}
           />

@@ -64,9 +64,49 @@
 
 .table-skeleton__row {
   display: grid;
-  grid-template-columns: 1.5fr 0.7fr 0.8fr 1.2fr;
+  grid-template-columns: 1.3fr 1fr 0.7fr 0.8fr 1.2fr;
   gap: 1rem;
   align-items: center;
+}
+
+.subject-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.2rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.subject-stat strong {
+  font-weight: 700;
+}
+
+.subject-stat--blue {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.45);
+  color: #3b82f6;
+}
+
+.subject-stat--green {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.45);
+  color: #22c55e;
+}
+
+.subject-stat--purple {
+  background: rgba(168, 85, 247, 0.12);
+  border-color: rgba(168, 85, 247, 0.45);
+  color: #a855f7;
+}
+
+.subject-stat--orange {
+  background: rgba(249, 115, 22, 0.12);
+  border-color: rgba(249, 115, 22, 0.45);
+  color: #f97316;
 }
 
 .dashboard__badge {

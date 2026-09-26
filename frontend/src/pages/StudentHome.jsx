@@ -134,7 +134,7 @@ function StudentHome() {
           <p className="feature-card__desc">
             Kerjakan 5 soal untuk mengetahui levelmu.
           </p>
-          <Link className="btn btn--primary feature-card__cta" to="/tes-diagnostik">
+          <Link className="btn btn--primary feature-card__cta" to="/diagnostic/select-subject">
             Mulai Tes
           </Link>
         </article>
@@ -201,7 +201,7 @@ function StudentHome() {
             ) : (
               <Link
                 className="btn btn--primary feature-card__cta"
-                to="/tes-diagnostik"
+                to="/diagnostic/select-subject"
               >
                 Mulai Tes Diagnostik
               </Link>

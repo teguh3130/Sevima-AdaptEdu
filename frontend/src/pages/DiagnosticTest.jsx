@@ -1,16 +1,34 @@
 import { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { addDoc, collection, serverTimestamp, updateDoc } from 'firebase/firestore'
 import { db } from '../lib/firebase.js'
-import questions from '../data/questions.js'
+import { useAuth } from '../context/AuthContext.jsx'
+import {
+  QUESTIONS,
+  getStoredSubject,
+  isValidSubject,
+  storeSubject,
+  subjectName,
+} from '../data/subjects.js'
 import './DiagnosticTest.css'
 
-const TOTAL = questions.length
 const API_BASE = import.meta.env.VITE_API_BASE_URL || ''
 
 function DiagnosticTest() {
+  const { user } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
+  const [params] = useSearchParams()
+  const [subject] = useState(() => {
+    const fromQuery = params.get('subject')
+    const fromState = location.state?.subject
+    if (isValidSubject(fromQuery)) return fromQuery
+    if (isValidSubject(fromState)) return fromState
+    return getStoredSubject()
+  })
+  const questions = QUESTIONS[subject]
+  const TOTAL = questions.length
+  const mapel = subjectName(subject)
   const [index, setIndex] = useState(0)
   const [selected, setSelected] = useState(null)
   const [answers, setAnswers] = useState([])
@@ -27,6 +45,10 @@ function DiagnosticTest() {
   const [practiceOnly, setPracticeOnly] = useState(false)
 
   const practiceLevel = location.state?.practiceLevel
+
+  useEffect(() => {
+    storeSubject(subject)
+  }, [subject])
 
   useEffect(() => {
     if (!practiceLevel) return
@@ -51,11 +73,15 @@ function DiagnosticTest() {
     setSaveState('saving')
     try {
       const docRef = await addDoc(collection(db, 'diagnosticScores'), {
+        uid: user?.uid ?? null,
         name: name.trim() || 'Tanpa Nama',
+        subject,
         score: finalScore,
         total: TOTAL,
         level: null,
+        reason: null,
         createdAt: serverTimestamp(),
+        timestamp: serverTimestamp(),
       })
       setSaveState('saved')
       return docRef
@@ -72,7 +98,7 @@ function DiagnosticTest() {
       const response = await fetch(`${API_BASE}/api/analyze-score`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ score: finalScore, total: TOTAL }),
+        body: JSON.stringify({ score: finalScore, total: TOTAL, subject }),
       })
       if (!response.ok) throw new Error(`HTTP ${response.status}`)
       const data = await response.json()
@@ -81,7 +107,10 @@ function DiagnosticTest() {
 
       if (docRef && data.level) {
         try {
-          await updateDoc(docRef, { level: data.level })
+          await updateDoc(docRef, {
+            level: data.level,
+            reason: data.reason ?? null,
+          })
         } catch (error) {
           console.error('Gagal menyimpan level:', error)
         }
@@ -99,7 +128,10 @@ function DiagnosticTest() {
       const response = await fetch(`${API_BASE}/api/practice`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ level: levelOverride ?? analysis?.level }),
+        body: JSON.stringify({
+          level: levelOverride ?? analysis?.level,
+          subject,
+        }),
       })
       if (!response.ok) throw new Error(`HTTP ${response.status}`)
       const data = await response.json()
@@ -184,8 +216,8 @@ function DiagnosticTest() {
     return (
       <section className="test">
         <header className="test__header">
-          <span className="test__badge">Tes Diagnostik</span>
-          <p className="test__counter">{TOTAL} soal pecahan</p>
+          <span className="test__badge">Tes Diagnostik - {mapel}</span>
+          <p className="test__counter">{TOTAL} soal {mapel}</p>
         </header>
 
         <div className="test__card">
@@ -358,13 +390,13 @@ function DiagnosticTest() {
           {score}
           <span>/{TOTAL}</span>
         </p>
-        <h1 className="result__title">Hasil Tes Diagnostik</h1>
+        <h1 className="result__title">Hasil Tes Diagnostik - {mapel}</h1>
         <p className="result__message">
           {score === TOTAL
-            ? 'Sempurna! Kamu menguasai materi pecahan.'
+            ? `Sempurna! Kamu menguasai materi ${mapel}.`
             : score >= 3
               ? 'Bagus! Sebagian besar jawabanmu benar.'
-              : 'Terus belajar materi pecahan, ya!'}
+              : `Terus belajar materi ${mapel}, ya!`}
         </p>
         <div className="analysis">
           {analysisState === 'loading' && (
@@ -398,7 +430,13 @@ function DiagnosticTest() {
             onClick={() =>
               navigate('/ringkasan', {
                 state: {
-                  result: { name, score, total: TOTAL, level: analysis?.level },
+                  result: {
+                    name,
+                    score,
+                    total: TOTAL,
+                    level: analysis?.level,
+                    subject,
+                  },
                 },
               })
             }
@@ -431,7 +469,7 @@ function DiagnosticTest() {
   return (
     <section className="test">
       <header className="test__header">
-        <span className="test__badge">Tes Diagnostik</span>
+        <span className="test__badge">Tes Diagnostik - {mapel}</span>
         <p className="test__counter">Soal {index + 1} dari {TOTAL}</p>
       </header>
 

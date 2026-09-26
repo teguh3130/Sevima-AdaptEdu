@@ -13,7 +13,7 @@ function Home() {
         siap untuk dikembangkan.
       </p>
       <div className="hero__actions">
-        <Link to="/tes-diagnostik" className="btn btn--primary">
+        <Link to="/diagnostic/select-subject" className="btn btn--primary">
           Mulai Tes Diagnostik
         </Link>
         <a href="https://react.dev" target="_blank" rel="noreferrer" className="btn btn--ghost">

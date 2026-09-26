@@ -1,10 +1,11 @@
 import { Router } from 'express'
 import { generateText } from '../lib/gemini.js'
+import { subjectOf } from '../lib/subjects.js'
 
 const router = Router()
 
 const PROMPT =
-  'Kamu adalah guru Matematika SMP Indonesia. Berdasarkan skor berikut tentukan level belajar: Dasar, Menengah, atau Lanjut. Berikan alasan maksimal satu kalimat. Balas hanya dalam format JSON dengan field level dan reason.'
+  'Kamu adalah guru SMP Indonesia. Mata pelajaran: {subject}. Berdasarkan skor {score} dari {total}, tentukan level belajar (Dasar, Menengah, Lanjut) dan berikan alasan maksimal satu kalimat. Balas hanya dalam format JSON dengan field level dan reason.'
 
 const LEVELS = ['Dasar', 'Menengah', 'Lanjut']
 
@@ -33,7 +34,7 @@ function parseResult(text) {
 }
 
 router.post('/api/analyze-score', async (req, res) => {
-  const { score, total = 5 } = req.body ?? {}
+  const { score, total = 5, subject } = req.body ?? {}
 
   if (
     typeof score !== 'number' ||
@@ -44,9 +45,13 @@ router.post('/api/analyze-score', async (req, res) => {
     return res.status(400).json({ error: 'Skor tidak valid' })
   }
 
+  const prompt = PROMPT.replace('{subject}', subjectOf(subject).label)
+    .replace('{score}', String(score))
+    .replace('{total}', String(total))
+
   try {
     const { text } = await generateText({
-      contents: `${PROMPT}\n\nSkor: ${score}/${total}`,
+      contents: prompt,
       temperature: 0,
       config: { responseMimeType: 'application/json' },
     })

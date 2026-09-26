@@ -10,7 +10,7 @@ const LEVELS = ['Dasar', 'Menengah', 'Lanjut']
 const MENU_BY_ROLE = {
   student: [
     { to: '/student', label: 'Beranda' },
-    { to: '/tes-diagnostik', label: 'Tes Diagnostik' },
+    { to: '/diagnostic/select-subject', label: 'Tes Diagnostik' },
     { to: '/ai-tutor', label: 'AI Tutor' },
     { to: '/ringkasan', label: 'Ringkasan' },
   ],

@@ -1,14 +1,16 @@
 import { Router } from 'express'
 import { generateText } from '../lib/gemini.js'
+import { subjectOf } from '../lib/subjects.js'
 
 const router = Router()
 
 const LEVELS = ['Dasar', 'Menengah', 'Lanjut']
 const VALID_ANSWERS = ['A', 'B', 'C', 'D']
 
-function buildPrompt(level) {
+function buildPrompt(level, subject) {
+  const { label, topic } = subjectOf(subject)
   return [
-    `Buat tepat 3 soal latihan Matematika SMP bertema pecahan untuk siswa level ${level}.`,
+    `Buat tepat 3 soal latihan ${label} SMP bertema ${topic} untuk siswa level ${level}.`,
     'Balas HANYA dengan JSON array, tanpa teks lain dan tanpa markdown, dengan format:',
     '[{"question":"pertanyaan","options":["pilihan A","pilihan B","pilihan C","pilihan D"],"answer":"B"}]',
     'Ketentuan: setiap soal punya tepat 4 pilihan jawaban, dan field answer adalah huruf A, B, C, atau D sesuai opsi yang benar.',
@@ -57,9 +59,9 @@ function parseQuestions(text) {
 }
 
 router.post('/api/practice', async (req, res) => {
-  const { level } = req.body ?? {}
+  const { level, subject } = req.body ?? {}
   const studentLevel = LEVELS.includes(level) ? level : 'Menengah'
-  const contents = buildPrompt(studentLevel)
+  const contents = buildPrompt(studentLevel, subject)
 
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
