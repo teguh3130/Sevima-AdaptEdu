@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom'
 import Navbar from './components/Navbar.jsx'
 import Home from './pages/Home.jsx'
+import DiagnosticTest from './pages/DiagnosticTest.jsx'
 import NotFound from './pages/NotFound.jsx'
 import './App.css'
 
@@ -11,6 +12,7 @@ function App() {
       <main className="main">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/tes-diagnostik" element={<DiagnosticTest />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

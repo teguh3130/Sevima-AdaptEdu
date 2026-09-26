@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import './Home.css'
 
 function Home() {
@@ -12,11 +13,11 @@ function Home() {
         siap untuk dikembangkan.
       </p>
       <div className="hero__actions">
-        <a href="https://react.dev" target="_blank" rel="noreferrer" className="btn btn--primary">
+        <Link to="/tes-diagnostik" className="btn btn--primary">
+          Mulai Tes Diagnostik
+        </Link>
+        <a href="https://react.dev" target="_blank" rel="noreferrer" className="btn btn--ghost">
           Dokumentasi React
-        </a>
-        <a href="https://expressjs.com" target="_blank" rel="noreferrer" className="btn btn--ghost">
-          Dokumentasi Express
         </a>
       </div>
     </section>

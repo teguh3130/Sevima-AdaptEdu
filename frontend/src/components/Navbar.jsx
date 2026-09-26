@@ -15,6 +15,9 @@ function Navbar() {
           <NavLink to="/" className="navbar__link" end>
             Beranda
           </NavLink>
+          <NavLink to="/tes-diagnostik" className="navbar__link">
+            Tes Diagnostik
+          </NavLink>
         </nav>
       </div>
     </header>
