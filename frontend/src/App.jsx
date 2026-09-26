@@ -15,7 +15,7 @@ function App() {
         </Routes>
       </main>
       <footer className="footer">
-        <p>&copy; {new Date().getFullYear()} EduBridge AI</p>
+        <p>&copy; {new Date().getFullYear()} AdaptEdu</p>
       </footer>
     </div>
   )

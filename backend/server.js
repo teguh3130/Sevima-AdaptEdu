@@ -12,7 +12,7 @@ app.use(express.json())
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
-    service: 'EduBridge AI API',
+    service: 'AdaptEdu API',
     env: {
       openaiApiKey: Boolean(process.env.OPENAI_API_KEY),
       firebase: Boolean(process.env.FIREBASE_PROJECT_ID),
@@ -25,5 +25,5 @@ app.use((req, res) => {
 })
 
 app.listen(PORT, () => {
-  console.log(`EduBridge AI backend running on http://localhost:${PORT}`)
+  console.log(`AdaptEdu backend running on http://localhost:${PORT}`)
 })

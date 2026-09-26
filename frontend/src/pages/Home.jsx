@@ -5,11 +5,11 @@ function Home() {
     <section className="hero">
       <span className="hero__badge">Fondasi Proyek</span>
       <h1 className="hero__title">
-        EduBridge <span className="hero__accent">AI</span>
+        Adapt<span className="hero__accent">Edu</span>
       </h1>
       <p className="hero__subtitle">
-        Jembatan pembelajaran yang diperkuat AI. Fondasi aplikasi React +
-        Express sudah siap untuk dikembangkan.
+        Platform belajar berbasis AI. Fondasi aplikasi React + Express sudah
+        siap untuk dikembangkan.
       </p>
       <div className="hero__actions">
         <a href="https://react.dev" target="_blank" rel="noreferrer" className="btn btn--primary">

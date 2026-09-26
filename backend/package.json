@@ -1,7 +1,7 @@
 {
-  "name": "edubridge-ai-backend",
+  "name": "adaptedu-ai-backend",
   "version": "1.0.0",
-  "description": "EduBridge AI - Backend API",
+  "description": "AdaptEdu - Backend API",
   "type": "module",
   "main": "server.js",
   "scripts": {

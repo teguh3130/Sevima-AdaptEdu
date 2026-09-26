@@ -7,9 +7,9 @@ function Navbar() {
       <div className="navbar__inner">
         <NavLink to="/" className="navbar__brand">
           <span className="navbar__logo" aria-hidden="true">
-            EA
+            AE
           </span>
-          EduBridge AI
+          AdaptEdu
         </NavLink>
         <nav className="navbar__nav">
           <NavLink to="/" className="navbar__link" end>
